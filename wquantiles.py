@@ -2,6 +2,7 @@
 Library to compute weighted quantiles, including the weighted median, of
 numpy arrays.
 """
+
 from polars import DataFrame, Series
 import jax.numpy as np
 
@@ -33,13 +34,12 @@ def quantile_1d(data: Series, weights: str, quantile: float):
     ind_sorted = np.argsort(data)
     sorted_data = data[ind_sorted]
     sorted_weights = weights[ind_sorted]
-    # Compute the auxiliary arrays
-    data = data.with_columns(
-        (pl.col(weights).cumsum() - 0.5 * pl.col(weights)) / pl.col(weights).cumsum()
-    )
     # TODO: Check that the weights do not sum zero
     # assert Sn != 0, "The sum of the weights must not be zero"
     Pn = (Sn - 0.5 * sorted_weights) / Sn[-1]
+    data = data.with_columns(
+        (pl.col(weights).cumsum() - 0.5 * pl.col(weights)) / pl.col(weights).cumsum()
+    )
     # Get the value of the weighted median
     return np.interp(quantile, Pn, sorted_data)
 
