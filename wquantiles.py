@@ -2,13 +2,13 @@
 Library to compute weighted quantiles, including the weighted median, of
 numpy arrays.
 """
-from __future__ import print_function
-import numpy as np
+from polars import DataFrame, Series
+import jax.numpy as np
 
 __version__ = "0.4"
 
 
-def quantile_1D(data, weights, quantile):
+def quantile_1d(data: Series, weights: str, quantile: float):
     """
     Compute the weighted quantile of a 1D numpy array.
 
@@ -23,38 +23,28 @@ def quantile_1D(data, weights, quantile):
 
     Returns
     -------
-    quantile_1D : float
+    quantile_1d : float
         The output value.
     """
-    # Check the data
-    if not isinstance(data, np.matrix):
-        data = np.asarray(data)
-    if not isinstance(weights, np.matrix):
-        weights = np.asarray(weights)
-    nd = data.ndim
-    if nd != 1:
-        raise TypeError("data must be a one dimensional array")
-    ndw = weights.ndim
-    if ndw != 1:
-        raise TypeError("weights must be a one dimensional array")
-    if data.shape != weights.shape:
-        raise TypeError("the length of data and weights must be the same")
-    if ((quantile > 1.) or (quantile < 0.)):
-        raise ValueError("quantile must have a value between 0. and 1.")
+    assert 0. <= quantile <= 1., (
+        "quantile must have a value between 0. and 1."
+    )
     # Sort the data
     ind_sorted = np.argsort(data)
     sorted_data = data[ind_sorted]
     sorted_weights = weights[ind_sorted]
     # Compute the auxiliary arrays
-    Sn = np.cumsum(sorted_weights)
+    data = data.with_columns(
+        (pl.col(weights).cumsum() - 0.5 * pl.col(weights)) / pl.col(weights).cumsum()
+    )
     # TODO: Check that the weights do not sum zero
-    #assert Sn != 0, "The sum of the weights must not be zero"
-    Pn = (Sn-0.5*sorted_weights)/Sn[-1]
+    # assert Sn != 0, "The sum of the weights must not be zero"
+    Pn = (Sn - 0.5 * sorted_weights) / Sn[-1]
     # Get the value of the weighted median
     return np.interp(quantile, Pn, sorted_data)
 
 
-def quantile(data, weights, quantile):
+def quantile(data, weights: str, quantile: float):
     """
     Weighted quantile of an array with respect to the last axis.
 
@@ -73,20 +63,16 @@ def quantile(data, weights, quantile):
     quantile : float
         The output value.
     """
-    # TODO: Allow to specify the axis
-    nd = data.ndim
-    if nd == 0:
-        TypeError("data must have at least one dimension")
-    elif nd == 1:
-        return quantile_1D(data, weights, quantile)
-    elif nd > 1:
+    if isinstance(data, Series):
+        return quantile_1d(data, weights, quantile)
+    elif isinstance(data, DataFrame):
         n = data.shape
         imr = data.reshape((np.prod(n[:-1]), n[-1]))
         result = np.apply_along_axis(quantile_1D, -1, imr, weights, quantile)
         return result.reshape(n[:-1])
 
 
-def median(data, weights):
+def median(data, weights: str):
     """
     Weighted median of an array with respect to the last axis.
 
