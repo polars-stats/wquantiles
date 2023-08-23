@@ -1,11 +1,6 @@
-import sys
-import traceback
-import os
-
 from polars import DataFrame, Series
 import numpy as np
 import numpy.testing as nptest
-import warnings
 
 from wquantiles import quantile_1d, quantile
 
