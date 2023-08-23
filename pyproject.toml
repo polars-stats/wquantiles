@@ -35,7 +35,4 @@ dev = [
 repository = "http://github.com/nudomarinero/wquantiles"
 
 [tool.setuptools.packages.find]
-include = [
-    "wquantiles.py",
-    "weighted.py",
-]
+include = ["wquantiles"]
