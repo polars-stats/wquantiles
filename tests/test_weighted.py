@@ -2,6 +2,7 @@ import sys
 import traceback
 import os
 
+from polars import DataFrame, Series
 import numpy as np
 import numpy.testing as nptest
 import warnings
@@ -12,18 +13,18 @@ from wquantiles import quantile_1d, quantile
 class TestPercentiles:
     def setup_method(self, method):
         # Sorted 1D array
-        self.a1d = np.array([0, 10, 20, 25, 30, 30, 35, 50])
-        self.a1d_w = np.array([0, 1, 0, 1, 2, 2, 2, 1])
+        self.a1d = Series([0, 10, 20, 25, 30, 30, 35, 50])
+        self.a1d_w = Series([0, 1, 0, 1, 2, 2, 2, 1])
         # Unsorted 1D array
-        self.a1du = np.array([30, 25, 0, 50, 30, 20, 35, 10])
-        self.a1du_w = np.array([2, 1, 0, 1, 2, 0, 2, 1])
+        self.a1du = Series([30, 25, 0, 50, 30, 20, 35, 10])
+        self.a1du_w = Series([2, 1, 0, 1, 2, 0, 2, 1])
         # 2D array
         self.a2d = np.array([[1, 3, 5, 6, 8,],
                              [5, 3, 4, 10, 3],
                              [4, 1, 1, 5, 7],
                              [10, 3, 5, 7, 8],
                              [1, 1, 6, 4, 6]])
-        self.aw = np.array([0, 1, 0, 1, 2])
+        self.aw = Series([0, 1, 0, 1, 2])
         self.layers = [np.array([[70, 51, 20, 19, 58],
                                [20, 50,  3, 28,  4],
                                [87, 71, 72, 40,  9],
@@ -49,21 +50,21 @@ class TestPercentiles:
                                [49, 62,  3, 92, 25],
                                [63, 34, 52, 51, 82],
                                [34, 32, 23, 23, 44]])]
-        self.a3d = np.empty((5,5,5))
+        self.a3d = np.empty((5, 5, 5))
         for i, layer in enumerate(self.layers):
             self.a3d[:, :, i] = layer
 
     def test_median(self):
-        assert np.median(self.a1D) == 27.5
-        assert np.median(self.a2D) == 5.0
-        assert list(np.median(self.a2d, axis=-1)) == [ 5.,  4.,  4.,  7.,  4.]
-        assert list(np.median(self.a2d, axis=1)) == [ 5.,  4.,  4.,  7.,  4.]
-        assert list(np.median(self.a2d, axis=0)) == [ 4.,  3.,  5.,  6.,  7.]
+        assert self.a1d.median() == 27.5
+        assert self.a2d.median() == 5.0
+        assert list(np.median(self.a2d, axis=-1)) == [5., 4., 4., 7., 4.]
+        assert list(np.median(self.a2d, axis=1)) == [5., 4., 4., 7., 4.]
+        assert list(np.median(self.a2d, axis=0)) == [4., 3., 5., 6., 7.]
 
     def test_weighted_median_1d_sorted(self):
         # Median of the sorted array
-        assert quantile_1d(self.a1d, self.a1d_w, 0.5), 30
-        assert quantile_1d(self.a1d, np.ones_like(self.a1d), 0.5), 27.5
+        assert quantile_1d(self.a1d, self.a1d_w, 0.5) == 30
+        assert quantile_1d(self.a1d, np.ones_like(self.a1d), 0.5) == 27.5
 
     def test_weighted_median_1d_unsorted(self):
         # Median of the unsorted array
