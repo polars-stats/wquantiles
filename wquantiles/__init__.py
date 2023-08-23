@@ -6,6 +6,7 @@ numpy arrays.
 from polars import DataFrame, Series
 import jax.numpy as np
 
+
 __version__ = "0.4"
 
 
