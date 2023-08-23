@@ -11,11 +11,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: setup-python ${{ matrix.python-version }}
+      - name: actions/setup-python@v4 (${{ matrix.python-version }})
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: install-dependencies
+      - name: pip3-install
         run: |
           pip3 install --upgrade pip
           pip3 install pytest
