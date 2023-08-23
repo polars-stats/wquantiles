@@ -44,7 +44,7 @@ def quantile_1d(data: Series, weights: str, quantile: float):
     return np.interp(quantile, Pn, sorted_data)
 
 
-def quantile(data, weights: str, quantile: float):
+def quantile(data: DataFrame | Series, weights: str, quantile: float):
     """
     Weighted quantile of an array with respect to the last axis.
 
@@ -72,7 +72,7 @@ def quantile(data, weights: str, quantile: float):
         return result.reshape(n[:-1])
 
 
-def median(data, weights: str):
+def median(data: DataFrame | Series, weights: str):
     """
     Weighted median of an array with respect to the last axis.
 
