@@ -43,7 +43,8 @@ def quantile_1d(frame: DataFrame, column: str, weights: str, quantile: float):
         frame
         .sort(column)
         .with_columns(
-            (pl.col(weights).cumsum() - 0.5 * pl.col(weights)) / pl.col(weights).cumsum()
+            (pl.col(weights).cumsum() - 0.5 * pl.col(weights))
+                / pl.col(weights).cumsum()
         )
         .select(pl.col(column) * pl.col(weights))
         .interpolate()
