@@ -77,7 +77,7 @@ def quantile(data: DataFrame | Series, weights: str, quantile: float):
     elif isinstance(data, DataFrame):
         n = data.shape
         imr = data.reshape((np.prod(n[:-1]), n[-1]))
-        result = np.apply_along_axis(quantile_1D, -1, imr, weights, quantile)
+        result = np.apply_along_axis(quantile_1d, -1, imr, weights, quantile)
         return result.reshape(n[:-1])
 
 
