@@ -11,7 +11,7 @@ import jax.numpy as np
 __version__ = "0.4"
 
 
-def quantile_1d(data: Series, weights: str, quantile: float):
+def quantile_1d(frame: DataFrame, column: str, weights: str, quantile: float):
     """
     Compute the weighted quantile of a 1D numpy array.
 
@@ -33,17 +33,24 @@ def quantile_1d(data: Series, weights: str, quantile: float):
         "quantile must have a value between 0. and 1."
     )
     # Sort the data
-    ind_sorted = np.argsort(data)
-    sorted_data = data[ind_sorted]
-    sorted_weights = weights[ind_sorted]
+    # ind_sorted = np.argsort(data)
+    # sorted_data = data[ind_sorted]
+    # sorted_weights = weights[ind_sorted]
     # TODO: Check that the weights do not sum zero
     # assert Sn != 0, "The sum of the weights must not be zero"
-    Pn = (Sn - 0.5 * sorted_weights) / Sn[-1]
-    data = data.with_columns(
-        (pl.col(weights).cumsum() - 0.5 * pl.col(weights)) / pl.col(weights).cumsum()
+    # Pn = (Sn - 0.5 * sorted_weights) / Sn[-1]
+    return (
+        frame
+        .sort(column)
+        .with_columns(
+            (pl.col(weights).cumsum() - 0.5 * pl.col(weights)) / pl.col(weights).cumsum()
+        )
+        .select(pl.col(column) * pl.col(weights))
+        .interpolate()
+        .quantile(wuantile)
     )
     # Get the value of the weighted median
-    return np.interp(quantile, Pn, sorted_data)
+    # return np.interp(quantile, Pn, sorted_data)
 
 
 def quantile(data: DataFrame | Series, weights: str, quantile: float):
