@@ -23,6 +23,7 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
+    "jax[cpu]",
     "numpy>=1.25",
     "polars>=0.18.0"
 ]
