@@ -8,8 +8,10 @@ from wquantiles import quantile_1d, quantile
 class TestPercentiles:
     def setup_method(self, method):
         # Sorted 1D array
-        self.a1d = Series([0, 10, 20, 25, 30, 30, 35, 50])
-        self.a1d_w = Series([0, 1, 0, 1, 2, 2, 2, 1])
+        self.a1d = DataFrame({
+            'data': [0, 10, 20, 25, 30, 30, 35, 50],
+            'weights': [0, 1, 0, 1, 2, 2, 2, 1]
+        })
         # Unsorted 1D array
         self.a1du = Series([30, 25, 0, 50, 30, 20, 35, 10])
         self.a1du_w = Series([2, 1, 0, 1, 2, 0, 2, 1])
@@ -58,7 +60,7 @@ class TestPercentiles:
 
     def test_weighted_median_1d_sorted(self):
         # Median of the sorted array
-        assert quantile_1d(self.a1d, self.a1d_w, 0.5) == 30
+        assert quantile_1d(self.a1d, 'data', 'weights', 0.5) == 30
         assert quantile_1d(self.a1d, np.ones_like(self.a1d), 0.5) == 27.5
 
     def test_weighted_median_1d_unsorted(self):
