@@ -47,7 +47,7 @@ def quantile_1d(frame: DataFrame, column: str, weights: str, quantile: float):
         )
         .select(pl.col(column) * pl.col(weights))
         .interpolate()
-        .quantile(wuantile)
+        .quantile(quantile)
     )
     # Get the value of the weighted median
     # return np.interp(quantile, Pn, sorted_data)
