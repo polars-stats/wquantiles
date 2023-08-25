@@ -3,6 +3,7 @@ Library to compute weighted quantiles, including the weighted median, of
 numpy arrays.
 """
 
+import polars as pl
 from polars import DataFrame, Series
 import jax.numpy as np
 
